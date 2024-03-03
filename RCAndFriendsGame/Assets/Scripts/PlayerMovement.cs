@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -10,13 +12,22 @@ public class PlayerMovement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //rigidBody = GetComponent<Rigidbody>();
+        playerStats = new StatSheet();
         playerStats.Health = 20f;
         playerStats.Speed = 1f;
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        
+        float horizontalMovement = Input.GetAxis("Horizontal");
+        float verticalMovement = Input.GetAxis("Vertical");
+        Console.WriteLine(horizontalMovement + " " + verticalMovement);
+
+        if (horizontalMovement > 0)
+        {
+            
+        }
     }
 }
