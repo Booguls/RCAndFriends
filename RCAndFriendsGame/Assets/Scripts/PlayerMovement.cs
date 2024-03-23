@@ -2,41 +2,76 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Security.Cryptography;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
     private Rigidbody rigidBody;
     private StatSheet playerStats;
+    private bool onGround = true;
+
+    [SerializeField] private Transform cam;
 
     // Start is called before the first frame update
     void Start()
     {
+        //Set player rigidbody to one attached to game object's, similar for stats.
         rigidBody = GetComponent<Rigidbody>();
-        playerStats = new StatSheet(20f, 2f);
-        //playerStats.Health = 20f;
-        //playerStats.Speed = 2f;
+        playerStats = new StatSheet(20f, 5f, 5f);
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        float horizontalMovement = Input.GetAxis("Horizontal");
-        float verticalMovement = Input.GetAxis("Vertical");
-        Vector3 moveVector = Vector3.zero;
-        if (horizontalMovement >= 0 && verticalMovement >= 0)
+        //Get user input
+        float horizInput = Input.GetAxis("Horizontal") * playerStats.Speed;
+        float vertInput = Input.GetAxis("Vertical") * playerStats.Speed;
+
+        //Get camera's forward position, will change with player's camera control
+        Vector3 camForward = cam.forward;
+        Vector3 camRight = cam.right;
+
+        //Reset y variables to prevent vector miscalculations
+        camForward.y = 0;
+        camRight.y = 0;
+
+        //Create a move vector, resulted by multiplying vertical input with camera's forward and similar for horizontal movement
+        Vector3 moveVector = vertInput * camForward + horizInput * camRight;
+
+        //Insert basic condition for player running, set to shift for now
+        //TODO: Explore generalization of shift key input.
+        if(Input.GetKey(KeyCode.LeftShift))
         {
-            moveVector = new Vector3(horizontalMovement, 0f, 0f);
-        }
-        else if (horizontalMovement != 0) 
-        {
-            moveVector = new Vector3(horizontalMovement, 0f, -horizontalMovement);
-        } 
-        else if (verticalMovement != 0)
-        {
-            moveVector = new Vector3(verticalMovement, 0f, verticalMovement);
+            moveVector.x *= 2;
+            moveVector.y *= 2;
         }
 
-        rigidBody.velocity = Vector3.Normalize(moveVector) * playerStats.Speed;
+        //Movement result occurs here
+        rigidBody.velocity = new Vector3(moveVector.x, rigidBody.velocity.y, moveVector.z);
+    }
+
+    //Separated from FixedUpdate function to more reliably capture user input
+    private void Update()
+    {
+        //Get input when user presses space and jumps
+        if (Input.GetKeyDown(KeyCode.Space) && onGround)
+        {
+            UnityEngine.Debug.Log("Space Pressed");
+            //Apply jump force as an impulse
+            rigidBody.AddForce(new Vector3(rigidBody.velocity.x, playerStats.Jump, rigidBody.velocity.z), ForceMode.Impulse);
+            onGround = false;
+        }
+    }
+
+    //Collision detection function
+    private void OnCollisionEnter(Collision collision)
+    {
+        UnityEngine.Debug.Log("Collided with: " + collision.gameObject.tag);
+        //Check if object collided with is terrain, if so player made contact with ground and can jump again
+        if (collision.gameObject.tag == "terrain")
+        {
+            onGround = true;
+        }
     }
 }
