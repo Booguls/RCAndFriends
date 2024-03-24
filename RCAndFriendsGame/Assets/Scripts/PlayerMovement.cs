@@ -71,7 +71,7 @@ public class PlayerMovement : MonoBehaviour
     }
 
     //Collision detection function
-    void OnCollisionEnter(Collision collision)
+    void OnCollisionStay(Collision collision)
     {
         //Check if object collided with is terrain, if so player made contact with ground and can jump again
         if (collision.gameObject.tag == "terrain")
@@ -87,6 +87,14 @@ public class PlayerMovement : MonoBehaviour
                     onGround = true;
                 }
             }
+        }
+    }
+
+    void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.tag == "terrain")
+        {
+            onGround = false;
         }
     }
 }
