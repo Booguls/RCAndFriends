@@ -27,16 +27,6 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        
-    }
-
-    //Separated from FixedUpdate function to more reliably capture user input
-    void Update()
-    {
-        //Get user input
-        horizInput = Input.GetAxis("Horizontal");
-        vertInput = Input.GetAxis("Vertical");
-
         //Get camera's forward position, will change with player's camera control
         Vector3 camForward = cam.forward;
         Vector3 camRight = cam.right;
@@ -62,6 +52,14 @@ public class PlayerMovement : MonoBehaviour
 
         //Movement result occurs here
         rigidBody.velocity = new Vector3(moveVector.x, rigidBody.velocity.y, moveVector.z);
+    }
+
+    //Separated from FixedUpdate function to more reliably capture user input
+    void Update()
+    {
+        //Get user input
+        horizInput = Input.GetAxisRaw("Horizontal");
+        vertInput = Input.GetAxisRaw("Vertical");
 
         //Get input when user presses space and jumps
         if (Input.GetKeyDown(KeyCode.Space) && onGround)
