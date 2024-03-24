@@ -61,9 +61,16 @@ public class PlayerMovement : MonoBehaviour
     //Separated from FixedUpdate function to more reliably capture user input
     void Update()
     {
+        //Alternate input to ONLY permit keyboard support
+        horizInput = 0f;
+        vertInput = 0f;
+        if (Input.GetKey(KeyCode.W)) vertInput = 1f;
+        else if (Input.GetKey(KeyCode.S)) vertInput = -1f;
+        if (Input.GetKey(KeyCode.A)) horizInput = -1f;
+        else if (Input.GetKey(KeyCode.D)) horizInput = 1f;
         //Get user input
-        horizInput = Input.GetAxisRaw("Horizontal");
-        vertInput = Input.GetAxisRaw("Vertical");
+        //horizInput = Input.GetAxisRaw("Horizontal");
+        //vertInput = Input.GetAxisRaw("Vertical");
 
         //Get input when user presses space and jumps
         if (Input.GetKeyDown(KeyCode.Space) && onGround)
