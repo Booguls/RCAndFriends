@@ -11,6 +11,9 @@ public class PlayerMovement : MonoBehaviour
     private StatSheet playerStats;
     private bool onGround = true;
 
+    private float horizInput;
+    private float vertInput;
+
     [SerializeField] private Transform cam;
 
     // Start is called before the first frame update
@@ -24,9 +27,15 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        
+    }
+
+    //Separated from FixedUpdate function to more reliably capture user input
+    void Update()
+    {
         //Get user input
-        float horizInput = Input.GetAxis("Horizontal") * playerStats.Speed;
-        float vertInput = Input.GetAxis("Vertical") * playerStats.Speed;
+        horizInput = Input.GetAxis("Horizontal");
+        vertInput = Input.GetAxis("Vertical");
 
         //Get camera's forward position, will change with player's camera control
         Vector3 camForward = cam.forward;
@@ -38,26 +47,25 @@ public class PlayerMovement : MonoBehaviour
 
         //Create a move vector, resulted by multiplying vertical input with camera's forward and similar for horizontal movement
         Vector3 moveVector = vertInput * camForward + horizInput * camRight;
+        moveVector = moveVector.normalized * playerStats.Speed;
 
         //Insert basic condition for player running, set to shift for now
         //TODO: Explore generalization of shift key input.
-        if(Input.GetKey(KeyCode.LeftShift))
+        /*
+        if (Input.GetKey(KeyCode.LeftShift))
         {
+            moveVector *= 2;
             moveVector.x *= 2;
             moveVector.y *= 2;
         }
+        */
 
         //Movement result occurs here
         rigidBody.velocity = new Vector3(moveVector.x, rigidBody.velocity.y, moveVector.z);
-    }
 
-    //Separated from FixedUpdate function to more reliably capture user input
-    private void Update()
-    {
         //Get input when user presses space and jumps
         if (Input.GetKeyDown(KeyCode.Space) && onGround)
         {
-            UnityEngine.Debug.Log("Space Pressed");
             //Apply jump force as an impulse
             rigidBody.AddForce(new Vector3(rigidBody.velocity.x, playerStats.Jump, rigidBody.velocity.z), ForceMode.Impulse);
             onGround = false;
@@ -65,13 +73,22 @@ public class PlayerMovement : MonoBehaviour
     }
 
     //Collision detection function
-    private void OnCollisionEnter(Collision collision)
+    void OnCollisionEnter(Collision collision)
     {
-        UnityEngine.Debug.Log("Collided with: " + collision.gameObject.tag);
         //Check if object collided with is terrain, if so player made contact with ground and can jump again
         if (collision.gameObject.tag == "terrain")
         {
-            onGround = true;
+            foreach (ContactPoint contactPoint in collision.contacts)
+            {
+                if (contactPoint.normal.x != 0f)
+                {
+                    onGround = false;
+                }
+                else if (contactPoint.normal.y > 0)
+                {
+                    onGround = true;
+                }
+            }
         }
     }
 }
