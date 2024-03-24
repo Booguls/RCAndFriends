@@ -14,14 +14,18 @@ public class PlayerMovement : MonoBehaviour
     private float horizInput;
     private float vertInput;
 
+    private Vector3 lookVector;
+
+    [SerializeField] private float ROTATE_SPEED = 15f;
     [SerializeField] private Transform cam;
 
     // Start is called before the first frame update
     void Start()
-    {
+    { 
         //Set player rigidbody to one attached to game object's, similar for stats.
         rigidBody = GetComponent<Rigidbody>();
         playerStats = new StatSheet(20f, 5f, 5f);
+        lookVector = Vector3.zero;
     }
 
     // Update is called once per frame
@@ -39,16 +43,16 @@ public class PlayerMovement : MonoBehaviour
         Vector3 moveVector = vertInput * camForward + horizInput * camRight;
         moveVector = moveVector.normalized * playerStats.Speed;
 
+        //This rotates the player object based on movement control, not mouse control.
+        if (horizInput != 0 || vertInput != 0) lookVector = moveVector;
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(lookVector), Time.deltaTime * ROTATE_SPEED);
+
         //Insert basic condition for player running, set to shift for now
         //TODO: Explore generalization of shift key input.
-        /*
         if (Input.GetKey(KeyCode.LeftShift))
         {
             moveVector *= 2;
-            moveVector.x *= 2;
-            moveVector.y *= 2;
         }
-        */
 
         //Movement result occurs here
         rigidBody.velocity = new Vector3(moveVector.x, rigidBody.velocity.y, moveVector.z);
@@ -57,9 +61,16 @@ public class PlayerMovement : MonoBehaviour
     //Separated from FixedUpdate function to more reliably capture user input
     void Update()
     {
+        //Alternate input to ONLY permit keyboard support
+        horizInput = 0f;
+        vertInput = 0f;
+        if (Input.GetKey(KeyCode.W)) vertInput = 1f;
+        else if (Input.GetKey(KeyCode.S)) vertInput = -1f;
+        if (Input.GetKey(KeyCode.A)) horizInput = -1f;
+        else if (Input.GetKey(KeyCode.D)) horizInput = 1f;
         //Get user input
-        horizInput = Input.GetAxisRaw("Horizontal");
-        vertInput = Input.GetAxisRaw("Vertical");
+        //horizInput = Input.GetAxisRaw("Horizontal");
+        //vertInput = Input.GetAxisRaw("Vertical");
 
         //Get input when user presses space and jumps
         if (Input.GetKeyDown(KeyCode.Space) && onGround)
