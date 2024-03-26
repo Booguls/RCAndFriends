@@ -89,13 +89,13 @@ public class PlayerMovement : MonoBehaviour
         {
             foreach (ContactPoint contactPoint in collision.contacts)
             {
-                if (contactPoint.normal.x != 0f)
-                {
-                    onGround = false;
-                }
-                else if (contactPoint.normal.y > 0)
+                if (contactPoint.normal.y > 0f)
                 {
                     onGround = true;
+                }
+                else if (contactPoint.normal.x != 0f)
+                {
+                    onGround = false;
                 }
             }
         }

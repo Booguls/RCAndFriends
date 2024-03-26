@@ -8,6 +8,10 @@ public class CameraMovement : MonoBehaviour
     [SerializeField] float mouseSpeed = 3;
     [SerializeField] float damp = 10;
 
+    float minFov = 15f;
+    float maxFov = 90f;
+    float sensitivity = 10f;
+
     Vector3 localRot;
 
     // Update is called once per frame
@@ -25,5 +29,12 @@ public class CameraMovement : MonoBehaviour
         //Apply quaternions, black magic fuckery happens here
         Quaternion qt = Quaternion.Euler(localRot.y, localRot.x, 0);
         transform.rotation = Quaternion.Lerp(transform.rotation, qt, Time.deltaTime * damp);
+
+        //Basic zoom in/out code obtained from unity help thread:
+        //https://discussions.unity.com/t/how-do-i-make-the-camera-zoom-in-and-out-with-the-mouse-wheel/36739
+        float fov = Camera.main.fieldOfView;
+        fov -= Input.GetAxis("Mouse ScrollWheel") * sensitivity;
+        fov = Mathf.Clamp(fov, minFov, maxFov);
+        Camera.main.fieldOfView = fov;
     }
 }
