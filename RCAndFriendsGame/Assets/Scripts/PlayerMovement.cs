@@ -24,7 +24,7 @@ public class PlayerMovement : MonoBehaviour
     { 
         //Set player rigidbody to one attached to game object's, similar for stats.
         rigidBody = GetComponent<Rigidbody>();
-        playerStats = new StatSheet(20f, 5f, 5f);
+        playerStats = new StatSheet(20f, 70f, 5f);
         lookVector = Vector3.zero;
     }
 
