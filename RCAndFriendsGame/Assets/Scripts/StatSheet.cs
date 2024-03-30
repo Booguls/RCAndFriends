@@ -2,11 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class StatSheet
 {
-    private float _health;
-    private float _speed;
-    private float _jumpPower;
+    [SerializeField] private float _health;
+    [SerializeField] private float _speed;
+    [SerializeField] private float _jumpPower;
     
     public StatSheet() 
     {

@@ -8,7 +8,7 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     private Rigidbody rigidBody;
-    private StatSheet playerStats;
+    public  StatSheet playerStats;
     private bool onGround = true;
 
     private float horizInput;
